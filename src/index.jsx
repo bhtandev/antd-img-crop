@@ -34,6 +34,19 @@ const EasyCrop = forwardRef((props, ref) => {
     cropperProps,
   } = props;
 
+  const limitSize = (size, maximumPixels) => {
+    const { width, height } = size;
+
+    const requiredPixels = width * height;
+    if (requiredPixels <= maximumPixels) return { width, height };
+
+    const scalar = Math.sqrt(maximumPixels) / Math.sqrt(requiredPixels);
+    return {
+      width: Math.floor(width * scalar),
+      height: Math.floor(height * scalar),
+    };
+  };
+
   const [crop, onCropChange] = useState({ x: 0, y: 0 });
   const [cropSize, setCropSize] = useState({ width: 0, height: 0 });
 
@@ -155,6 +168,7 @@ const ImgCrop = forwardRef((props, ref) => {
     minZoom = 1,
     maxZoom = 3,
 
+    maximumPixels,
     modalTitle,
     modalWidth,
     modalOk,
@@ -265,8 +279,15 @@ const ImgCrop = forwardRef((props, ref) => {
       // get container for rotated image
       const sine = Math.abs(Math.sin(angle));
       const cosine = Math.abs(Math.cos(angle));
-      const squareWidth = imgWidth * cosine + imgHeight * sine;
-      const squareHeight = imgHeight * cosine + imgWidth * sine;
+
+      const size = {
+        width: imgWidth * cosine + imgHeight * sine,
+        height: imgHeight * cosine + imgWidth * sine,
+      };
+
+      const { width: squareWidth, height: squareHeight } = maximumPixels
+        ? limitSize(size, maximumPixels)
+        : size;
 
       canvas.width = squareWidth;
       canvas.height = squareHeight;
