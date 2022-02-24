@@ -14,6 +14,19 @@ const ROTATE_STEP = 1;
 const MIN_ROTATE = -180;
 const MAX_ROTATE = 180;
 
+const limitSize = (size, maximumPixels) => {
+  const { width, height } = size;
+
+  const requiredPixels = width * height;
+  if (requiredPixels <= maximumPixels) return { width, height };
+
+  const scalar = Math.sqrt(maximumPixels) / Math.sqrt(requiredPixels);
+  return {
+    width: Math.floor(width * scalar),
+    height: Math.floor(height * scalar),
+  };
+};
+
 const EasyCrop = forwardRef((props, ref) => {
   const {
     image,
@@ -33,19 +46,6 @@ const EasyCrop = forwardRef((props, ref) => {
 
     cropperProps,
   } = props;
-
-  const limitSize = (size, maximumPixels) => {
-    const { width, height } = size;
-
-    const requiredPixels = width * height;
-    if (requiredPixels <= maximumPixels) return { width, height };
-
-    const scalar = Math.sqrt(maximumPixels) / Math.sqrt(requiredPixels);
-    return {
-      width: Math.floor(width * scalar),
-      height: Math.floor(height * scalar),
-    };
-  };
 
   const [crop, onCropChange] = useState({ x: 0, y: 0 });
   const [cropSize, setCropSize] = useState({ width: 0, height: 0 });
